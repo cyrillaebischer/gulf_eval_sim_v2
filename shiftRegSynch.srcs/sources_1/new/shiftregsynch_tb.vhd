@@ -35,13 +35,15 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity shiftregsynch_top is
     port(
-        word_out : out std_logic_vector(31 downto 0)
+        word_out : out std_logic_vector(31 downto 0);
+        fifo_rd_en_i: in std_logic
     );   
 end shiftregsynch_top;
 
 architecture Behavioral of shiftregsynch_top is
+    -- clocking signals
     constant clk_i_period : time := 0.78 ns;  -- 1/127 = 7.8740157
-    signal clk_i, rst_i : std_logic;
+    signal clk_i, rst_i: std_logic;
     
     signal bit_in_s : std_logic := '0';
     signal shiftreg_s: std_logic_vector(9 downto 0);
@@ -52,9 +54,25 @@ architecture Behavioral of shiftregsynch_top is
     signal disp_s, DataK_out_s, rxCodeErr, rxDispErr  : std_logic;
     
     signal word_pack_s  : std_logic_vector(31 downto 0);
+    signal word_output_s : std_logic;
     signal cnt_en_s, cnt_rst_s  : std_logic;
     signal cnt_o_s   : std_logic_vector(3 downto 0);
     
+    -- FIFO signals
+    signal fifo_wr_en_s : std_logic;
+    signal fifo_full_s, fifo_empty_s, fifo_ol_s, fifo_ul_s, fifo_val_s: std_logic;
+    signal rd_en_tst : std_logic:= '0';
+    
+    -- BEGIN COMPONENT DECLARATIONS --
+    component fifo_statemachine is
+        Port (
+            clk_i: in std_logic;
+            rst_i: in std_logic;
+            cnt_o_i: in std_logic_vector(3 downto 0);
+            word_valid_i: in std_logic;
+            fifo_wr_o: out std_logic
+            );
+    end component;
     
     component sipo is
         port(
@@ -85,9 +103,25 @@ architecture Behavioral of shiftregsynch_top is
              cnt_o   : out std_logic_vector(3 downto 0)
             );
     end component;
+    
+    COMPONENT fifo_32bit
+      PORT (
+        rst : IN STD_LOGIC;
+        clk : IN STD_LOGIC;
+        din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        wr_en : IN STD_LOGIC;
+        rd_en : IN STD_LOGIC;
+        dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+        full : OUT STD_LOGIC;
+        overflow : OUT STD_LOGIC;
+        empty : OUT STD_LOGIC;
+        valid : OUT STD_LOGIC;
+        underflow : OUT STD_LOGIC
+      );
+    END COMPONENT;
         
 begin
-    cnt_rst_s <= '1' when (rst_i = '1' or comma_s = '1') else '0';
+    cnt_rst_s <= '1' when (rst_i = '1' ) else '0'; --or comma_s = '1'
     
     ---- shiftregister ----
     shift_reg: sipo
@@ -169,7 +203,9 @@ word_pack: process(clk_i)
                     case word_cnt_v is
                         when "00" =>
                             word_pack_s(31 downto 24) <= data8b_s; 
+                            word_output_s <= '0';
                             word_cnt_v := word_cnt_v +1;
+                            
                         when "01" =>
                             word_pack_s(23 downto 16) <= data8b_s; 
                             word_cnt_v := word_cnt_v +1;
@@ -178,18 +214,50 @@ word_pack: process(clk_i)
                             word_cnt_v := word_cnt_v +1;
                         when "11"=>
                             word_pack_s(7 downto 0) <= data8b_s; 
-                            word_cnt_v := word_cnt_v +1;
+                            word_cnt_v := "00";
+                            word_output_s <= '1';
                         when others =>
+                            --word_output_s <= '0';
                         
                     end case;
                 end if;
             else
                 word_pack_s <= (others => '0');
-            end if;  
+            end if;
+            
+--        if word_output_s = '1' then 
+--            word_out <= word_pack_s;
+--        end if;
+        
         end if;
     end process;
             
+    -------- FiFo ---------
+    fifo_fsm: fifo_statemachine
+        port map(
+            clk_i => clk_i,
+            rst_i => rst_i,
+            cnt_o_i => cnt_o_s,
+            word_valid_i => word_output_s,
+            fifo_wr_o => fifo_wr_en_s
+            );
     
+    data_fifo : fifo_32bit
+          PORT MAP (
+            rst => rst_i,
+            clk => clk_i,
+            din => word_pack_s,
+            wr_en => fifo_wr_en_s,
+            rd_en => rd_en_tst,
+            dout => word_out,
+            full => fifo_full_s,
+            overflow => fifo_ol_s,
+            empty => fifo_empty_s,
+            valid => fifo_val_s,
+            underflow => fifo_ul_s
+          );
+
+        
     ---- clock process ----
 clkX1: process
     begin 
@@ -203,7 +271,7 @@ clkX1: process
     reset: process
     begin
         rst_i <= '1';
-        wait for 10 ns;
+        wait for 30 ns;
         rst_i <= '0';
        wait;
     end process;

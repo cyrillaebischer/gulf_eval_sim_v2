@@ -126,12 +126,13 @@ begin
                     end case;
                     
                 end if;
+                if reg_intl_s = k28p0 then
+                    comma_o <= '1';
+                else 
+                    comma_o <= '0';
+                end if;
             end if;
-            if reg_intl_s = k28p0 then
-                comma_o <= '1';
-            else 
-                comma_o <= '0';
-            end if;
+            
             cnt_train_s <= std_logic_vector(to_unsigned(cnt_train_v,4)); 
         end process;   
         rst_s <= rst_i or rst_cnt_s;   

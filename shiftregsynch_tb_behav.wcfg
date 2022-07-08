@@ -3,95 +3,117 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="shiftregsynch_tb_behav.wdb" id="1">
+      <db_ref path="shiftregsynch_top_behav.wdb" id="1">
          <top_modules>
-            <top_module name="shiftregsynch_tb" />
+            <top_module name="shiftregsynch_top" />
+            <top_module name="utilitypkg" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1510470000fs"></ZoomStartTime>
-      <ZoomEndTime time="1584270001fs"></ZoomEndTime>
-      <Cursor1Time time="1529580000fs"></Cursor1Time>
+      <ZoomStartTime time="994625000fs"></ZoomStartTime>
+      <ZoomEndTime time="1032125001fs"></ZoomEndTime>
+      <Cursor1Time time="1000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="136"></NameColumnWidth>
-      <ValueColumnWidth column_width="84"></ValueColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="17" />
-   <wvobject fp_name="/shiftregsynch_tb/clk_i" type="logic">
+   <WVObjectSize size="24" />
+   <wvobject fp_name="/shiftregsynch_top/clk_i" type="logic">
       <obj_property name="ElementShortName">clk_i</obj_property>
       <obj_property name="ObjectShortName">clk_i</obj_property>
-      <obj_property name="CustomSignalColor">#A0A0A4</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/rst_i" type="logic">
+   <wvobject fp_name="/shiftregsynch_top/rst_i" type="logic">
       <obj_property name="ElementShortName">rst_i</obj_property>
       <obj_property name="ObjectShortName">rst_i</obj_property>
-      <obj_property name="CustomSignalColor">#808080</obj_property>
-      <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/bit_in_s" type="logic">
-      <obj_property name="ElementShortName">bit_in_s</obj_property>
-      <obj_property name="ObjectShortName">bit_in_s</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/shiftreg_s" type="array">
-      <obj_property name="ElementShortName">shiftreg_s[9:0]</obj_property>
-      <obj_property name="ObjectShortName">shiftreg_s[9:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/commalink/reg_intl_s" type="array">
-      <obj_property name="ElementShortName">reg_intl_s[9:0]</obj_property>
-      <obj_property name="ObjectShortName">reg_intl_s[9:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/commalink/reg_o" type="array">
-      <obj_property name="ElementShortName">reg_o[9:0]</obj_property>
-      <obj_property name="ObjectShortName">reg_o[9:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/commalink/state_s" type="other">
-      <obj_property name="ElementShortName">state_s</obj_property>
-      <obj_property name="ObjectShortName">state_s</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/synched_s" type="logic">
-      <obj_property name="ElementShortName">synched_s</obj_property>
-      <obj_property name="ObjectShortName">synched_s</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/comma_s" type="logic">
+   <wvobject fp_name="/shiftregsynch_top/comma_s" type="logic">
       <obj_property name="ElementShortName">comma_s</obj_property>
       <obj_property name="ObjectShortName">comma_s</obj_property>
    </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/shift_reg/data_i" type="logic">
+      <obj_property name="ElementShortName">data_i</obj_property>
+      <obj_property name="ObjectShortName">data_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/commalink/state_s" type="other">
+      <obj_property name="ElementShortName">state_s</obj_property>
+      <obj_property name="ObjectShortName">state_s</obj_property>
+   </wvobject>
    <wvobject type="divider" fp_name="divider27">
-      <obj_property name="label">Decoder</obj_property>
+      <obj_property name="label">FIFO FSM</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/U_Decode8b10b/dataOut" type="array">
+   <wvobject fp_name="/shiftregsynch_top/fifo_fsm/state_s" type="other">
+      <obj_property name="ElementShortName">state_s</obj_property>
+      <obj_property name="ObjectShortName">state_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/fifo_fsm/word_valid_i" type="logic">
+      <obj_property name="ElementShortName">word_valid_i</obj_property>
+      <obj_property name="ObjectShortName">word_valid_i</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/fifo_fsm/fifo_wr_o" type="logic">
+      <obj_property name="ElementShortName">fifo_wr_o</obj_property>
+      <obj_property name="ObjectShortName">fifo_wr_o</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider16">
+      <obj_property name="label">FIFO</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">dataOut[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dataOut[7:0]</obj_property>
-      <obj_property name="label">decode_Out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/data_fifo/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/data_fifo/wr_en" type="logic">
+      <obj_property name="ElementShortName">wr_en</obj_property>
+      <obj_property name="ObjectShortName">wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/data_fifo/rd_en" type="logic">
+      <obj_property name="ElementShortName">rd_en</obj_property>
+      <obj_property name="ObjectShortName">rd_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/rd_en_tst" type="logic">
+      <obj_property name="ElementShortName">rd_en_tst</obj_property>
+      <obj_property name="ObjectShortName">rd_en_tst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/data_fifo/empty" type="logic">
+      <obj_property name="ElementShortName">empty</obj_property>
+      <obj_property name="ObjectShortName">empty</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/data_fifo/full" type="logic">
+      <obj_property name="ElementShortName">full</obj_property>
+      <obj_property name="ObjectShortName">full</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/data_fifo/din" type="array">
+      <obj_property name="ElementShortName">din[31:0]</obj_property>
+      <obj_property name="ObjectShortName">din[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/data_fifo/dout" type="array">
+      <obj_property name="ElementShortName">dout[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dout[31:0]</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider63">
       <obj_property name="label">Counter</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/commalink/cnt_s" type="array">
-      <obj_property name="ElementShortName">cnt_s[3:0]</obj_property>
-      <obj_property name="ObjectShortName">cnt_s[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/commalink/cnt_train_s" type="array">
-      <obj_property name="ElementShortName">cnt_train_s[3:0]</obj_property>
-      <obj_property name="ObjectShortName">cnt_train_s[3:0]</obj_property>
+   <wvobject fp_name="/shiftregsynch_top/cnt_o_s" type="array">
+      <obj_property name="ElementShortName">cnt_o_s[3:0]</obj_property>
+      <obj_property name="ObjectShortName">cnt_o_s[3:0]</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider30">
       <obj_property name="label">TOP word pack</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/word_pack_s" type="array">
+   <wvobject fp_name="/shiftregsynch_top/word_pack_s" type="array">
       <obj_property name="ElementShortName">word_pack_s[31:0]</obj_property>
       <obj_property name="ObjectShortName">word_pack_s[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/shiftregsynch_tb/cnt_o_s" type="array">
-      <obj_property name="ElementShortName">cnt_o_s[3:0]</obj_property>
-      <obj_property name="ObjectShortName">cnt_o_s[3:0]</obj_property>
+   <wvobject fp_name="/shiftregsynch_top/word_output_s" type="logic">
+      <obj_property name="ElementShortName">word_output_s</obj_property>
+      <obj_property name="ObjectShortName">word_output_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/word_out" type="array">
+      <obj_property name="ElementShortName">word_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">word_out[31:0]</obj_property>
    </wvobject>
 </wave_config>

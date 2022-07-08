@@ -1,2 +1,2 @@
 INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/Cyrill/Documents/S6/BA-GULFstream/shiftRegSynch/shiftRegSynch.srcs/sources_1/new/shiftregsynch_tb.vhd" into library xil_defaultlib
-INFO: [VRFC 10-307] analyzing entity shiftregsynch_tb
+INFO: [VRFC 10-307] analyzing entity shiftregsynch_top

@@ -1,6 +1,6 @@
 Vivado Simulator 2018.2
 Copyright 1986-1999, 2001-2018 Xilinx, Inc. All Rights Reserved.
-Running: C:/Xilinx/Vivado/2018.2/bin/unwrapped/win64.o/xelab.exe -wto dec62e506ecb4790b813d1b012f0dd96 --incr --debug typical --relax --mt 2 -L xil_defaultlib -L secureip --snapshot shiftregsynch_tb_behav xil_defaultlib.shiftregsynch_tb -log elaborate.log 
+Running: C:/Xilinx/Vivado/2018.2/bin/unwrapped/win64.o/xelab.exe -wto dec62e506ecb4790b813d1b012f0dd96 --incr --debug typical --relax --mt 2 -L fifo_generator_v13_2_2 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot shiftregsynch_top_behav xil_defaultlib.shiftregsynch_top xil_defaultlib.glbl -log elaborate.log 
 Using 2 slave threads.
 Starting static elaboration
 Completed static elaboration
@@ -15,10 +15,34 @@ Compiling package ieee.numeric_std
 Compiling package ieee.std_logic_arith
 Compiling package ieee.std_logic_unsigned
 Compiling package xil_defaultlib.utilitypkg
+Compiling package synopsys.attributes
+Compiling package ieee.std_logic_misc
+Compiling package fifo_generator_v13_2_2.fifo_generator_v13_2_2_pkg
+Compiling package xpm.vcomponents
+Compiling package unisim.vcomponents
+Compiling package ieee.vital_timing
+Compiling package ieee.vital_primitives
+Compiling package unisim.vpkg
+Compiling package vl.vl_types
+Compiling module xil_defaultlib.glbl
 Compiling architecture behavioral of entity xil_defaultlib.DFF [dff_default]
 Compiling architecture mix of entity xil_defaultlib.sipo [sipo_default]
 Compiling architecture behavioral of entity xil_defaultlib.counter [counter_default]
 Compiling architecture behavioral of entity xil_defaultlib.sync_statemachine [sync_statemachine_default]
 Compiling architecture rtl of entity xil_defaultlib.Decode8b10b [decode8b10b_default]
-Compiling architecture behavioral of entity xil_defaultlib.shiftregsynch_tb
-Built simulation snapshot shiftregsynch_tb_behav
+Compiling architecture behavioral of entity xil_defaultlib.fifo_statemachine [fifo_statemachine_default]
+Compiling architecture xilinx of entity fifo_generator_v13_2_2.reset_builtin [\reset_builtin(c_has_int_clk=0)\]
+Compiling architecture ff18_internal_vhdl_v of entity unisim.FF18_INTERNAL_VHDL [\FF18_INTERNAL_VHDL(almost_full_...]
+Compiling architecture fifo18e1_v of entity unisim.FIFO18E1 [\FIFO18E1(almost_full_offset="00...]
+Compiling architecture xilinx of entity fifo_generator_v13_2_2.builtin_prim_v6 [\builtin_prim_v6(c_family="7SERI...]
+Compiling architecture xilinx of entity fifo_generator_v13_2_2.builtin_extdepth_v6 [\builtin_extdepth_v6(c_family="7...]
+Compiling architecture xilinx of entity fifo_generator_v13_2_2.builtin_top_v6 [\builtin_top_v6(c_family="7SERIE...]
+Compiling architecture xilinx of entity fifo_generator_v13_2_2.input_blk [\input_blk(c_din_width=32,c_pktf...]
+Compiling architecture xilinx of entity fifo_generator_v13_2_2.output_blk [\output_blk(c_dout_width=32,c_pk...]
+Compiling architecture xilinx of entity fifo_generator_v13_2_2.fifo_generator_v13_2_2_builtin [\fifo_generator_v13_2_2_builtin(...]
+Compiling architecture xilinx of entity fifo_generator_v13_2_2.fifo_generator_top [\fifo_generator_top(c_family="vi...]
+Compiling architecture xilinx of entity fifo_generator_v13_2_2.fifo_generator_v13_2_2_synth [\fifo_generator_v13_2_2_synth(c_...]
+Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2(C_COMMON_...
+Compiling module xil_defaultlib.fifo_32bit
+Compiling architecture behavioral of entity xil_defaultlib.shiftregsynch_top
+Built simulation snapshot shiftregsynch_top_behav
