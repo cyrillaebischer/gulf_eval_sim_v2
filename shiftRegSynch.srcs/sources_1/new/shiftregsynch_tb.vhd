@@ -43,7 +43,9 @@ end shiftregsynch_top;
 architecture Behavioral of shiftregsynch_top is
     -- clocking signals
     constant clk_i_period : time := 0.78 ns;  -- 1/127 = 7.8740157
-    signal clk_i, rst_i: std_logic;
+    signal clk_i, rst_i, clk_div: std_logic;
+    
+    signal rst_clkdiv : std_logic;
     
     signal bit_in_s : std_logic := '0';
     signal shiftreg_s: std_logic_vector(9 downto 0);
@@ -55,7 +57,8 @@ architecture Behavioral of shiftregsynch_top is
     
     signal word_pack_s  : std_logic_vector(31 downto 0);
     signal word_output_s : std_logic;
-    signal cnt_en_s, cnt_rst_s  : std_logic;
+    signal cnt_en_s   : std_logic := '0';
+    signal cnt_rst_s  : std_logic;
     signal cnt_o_s   : std_logic_vector(3 downto 0);
     
     -- FIFO signals
@@ -64,6 +67,13 @@ architecture Behavioral of shiftregsynch_top is
     signal rd_en_tst : std_logic:= '0';
     
     -- BEGIN COMPONENT DECLARATIONS --
+    component Clock_Divider is
+        port (
+            clk  : in std_logic;
+            reset: in std_logic;
+            clock_out: out std_logic);
+    end component;
+    
     component fifo_statemachine is
         Port (
             clk_i: in std_logic;
@@ -193,13 +203,13 @@ begin
     end process;
     
     ---- word packaging process ----
-word_pack: process(clk_i)
+word_pack: process(clk_i, clk_div)
     variable word_cnt_v : unsigned(1 downto 0) := "00";
     begin
-        if rising_edge(clk_i) then 
+       -- if rising_edge(clk_i) then 
             if (comma_s = '0') and (synched_s = '1') then
                 cnt_en_s <= '1';
-                if cnt_o_s = "0001" then
+                if rising_edge(clk_div) then                    
                     case word_cnt_v is
                         when "00" =>
                             word_pack_s(31 downto 24) <= data8b_s; 
@@ -229,7 +239,7 @@ word_pack: process(clk_i)
 --            word_out <= word_pack_s;
 --        end if;
         
-        end if;
+    --    end if;
     end process;
             
     -------- FiFo ---------
@@ -258,7 +268,15 @@ word_pack: process(clk_i)
           );
 
         
-    ---- clock process ----
+    rst_clkdiv <= not(synched_s);
+    clk_divider: Clock_Divider
+        port map(
+            clk  => clk_i,
+            reset=> rst_clkdiv,
+            clock_out => clk_div
+            );
+            
+    ---- clock process ----   
 clkX1: process
     begin 
         clk_i <= '0';

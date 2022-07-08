@@ -44,5 +44,6 @@ Compiling architecture xilinx of entity fifo_generator_v13_2_2.fifo_generator_to
 Compiling architecture xilinx of entity fifo_generator_v13_2_2.fifo_generator_v13_2_2_synth [\fifo_generator_v13_2_2_synth(c_...]
 Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2(C_COMMON_...
 Compiling module xil_defaultlib.fifo_32bit
+Compiling architecture bhv of entity xil_defaultlib.Clock_Divider [clock_divider_default]
 Compiling architecture behavioral of entity xil_defaultlib.shiftregsynch_top
 Built simulation snapshot shiftregsynch_top_behav
