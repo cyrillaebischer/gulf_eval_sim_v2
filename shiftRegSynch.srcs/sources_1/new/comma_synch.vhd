@@ -106,13 +106,13 @@ begin
                                 cnt_train_v := cnt_train_v + 1;
                                 if cnt_train_v = 3 then 
                                     state_s <= locked;
+                                                
                                 end if;
                             elsif cnt_s = "1001" and reg_i /= k28p0 then
                                 reg_intl_s <= reg_i;
                                 state_s <= SCAN;
                             end if;
-                            
-                            
+                             
                         when LOCKED =>
                             aligned_o <= '1';
                             if cnt_s = "1001" then
