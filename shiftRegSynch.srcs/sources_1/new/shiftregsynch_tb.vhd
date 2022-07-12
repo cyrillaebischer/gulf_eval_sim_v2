@@ -62,7 +62,6 @@ architecture Behavioral of shiftregsynch_top is
     -- Data Extraction
     signal word_pack_s  : std_logic_vector(31 downto 0);
     signal word_output_s : std_logic;
-    signal cnt_o_s   : std_logic_vector(3 downto 0);
     
     ---------------------------------------------------------------------------------
     -- BEGIN COMPONENT DECLARATIONS --
@@ -86,7 +85,8 @@ architecture Behavioral of shiftregsynch_top is
         port(
             reg_i : in std_logic_vector(9 downto 0);
             clk_i : in std_logic;
-            rst_i : in std_logic;          
+            rst_i : in std_logic;  
+            err_i : in std_logic;        
             reg_o : out std_logic_vector(9 downto 0);
             aligned_o : out std_logic;
             comma_o : out std_logic
@@ -122,6 +122,7 @@ begin
             reg_i => shiftreg_s,
             clk_i => clk_i,
             rst_i => rst_i,
+            err_i => rxCodeErr,
             reg_o => locked_sig_o,
             aligned_o => synched_s,
             comma_o => comma_s
@@ -147,7 +148,7 @@ begin
     ---- Bit read in process ----
     rd_values: process(clk_i)
         
-        file fp_output : text is in "C:\Users\Cyrill\Documents\S6\BA-GULFstream\Gulf_Eval_Setup\Gulf_Eval_Setup\8chan_output.dat";
+        file fp_output : text is in "C:\Users\Cyrill\Documents\S6\BA-GULFstream\Gulf_Eval_Setup\Gulf_Eval_Setup\8chan_output_err.dat";
         variable ln_r     : line;
         variable x : std_logic;
         

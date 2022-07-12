@@ -36,6 +36,7 @@ entity sync_statemachine is
         reg_i : in std_logic_vector(9 downto 0);
         clk_i : in std_logic;
         rst_i : in std_logic;
+        err_i : in std_logic;
         
         reg_o : out std_logic_vector(9 downto 0);
         aligned_o : out std_logic;
@@ -65,6 +66,7 @@ architecture Behavioral of sync_statemachine is
         );
     signal state_s: FSM_state;
 begin
+    
     count_10: counter
         port map(
             en_i => cnt_en_s,
@@ -83,12 +85,14 @@ begin
                     state_s  <= RESET;
                     reg_intl_s <= (others => '0');
                     aligned_o <= '0';  
-                    reg_o <= (others => '0');
-                    reg_intl_s <= (others => '0');              
+                    reg_o <= (others => '0');        
                 else
                     case state_s is
                         when RESET =>
                             cnt_train_v := 0;
+                            aligned_o <= '0';
+                            reg_intl_s <= (others => '0');
+                            reg_o <= (others => '0');
                             state_s <= SCAN;
                             
                         when SCAN =>
@@ -103,23 +107,27 @@ begin
                         when TRAINING =>                           
                             if cnt_s = "1001" and reg_i = k28p0 then
                                 reg_intl_s <= reg_i;
-                                cnt_train_v := cnt_train_v + 1;
-                                if cnt_train_v = 3 then 
-                                    state_s <= locked;
-                                                
+                                if cnt_train_v = 3 then
+                                    reg_o <= reg_i;
+                                    if err_i = '0' then
+                                        state_s <= locked;
+                                    end if;
+                                else 
+                                    cnt_train_v := cnt_train_v + 1;
                                 end if;
                             elsif cnt_s = "1001" and reg_i /= k28p0 then
                                 reg_intl_s <= reg_i;
                                 state_s <= SCAN;
+                                
                             end if;
-                             
                         when LOCKED =>
                             aligned_o <= '1';
                             if cnt_s = "1001" then
                                 reg_intl_s <= reg_i;
                                 reg_o <= reg_i;
+                            elsif err_i = '1' then
+                                state_s <= RESET;
                             end if;
-                             
                         when others =>
                             null;
                             
