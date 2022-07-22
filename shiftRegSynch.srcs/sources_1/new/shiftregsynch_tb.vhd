@@ -73,7 +73,11 @@ architecture Behavioral of shiftregsynch_top is
     signal word_output_s : std_logic;
     signal valid_s      : std_logic;                                                                        
     signal wr_en_s      : std_logic;     
-    signal rst_fsm_s    : std_logic;                                                                       
+    signal rst_fsm_s    : std_logic;   
+    signal hdr_bit_s : std_logic; --for header check, error if 0 in first byte    
+    
+    -- global signals
+    signal glb_error_s  : std_logic;                                                           
     
     
     ---------------------------------------------------------------------------------
@@ -186,7 +190,7 @@ begin
             reg_i => shiftreg_s,
             clk_i => clk_i,
             rst_i => rst_i,
-            err_i => rxCodeErr,
+            err_i => glb_error_s,
             reg_o => locked_sig_o,
             aligned_o => synched_s,
             comma_o => comma_s
@@ -212,7 +216,7 @@ begin
     ---- Bit read in process ----
     rd_values: process(clk_i)
         
-        file fp_output : text is in "C:\Users\Cyrill\Documents\S6\BA-GULFstream\shiftRegSynch_v2\8chan_output.dat";
+        file fp_output : text is in "C:\Users\Cyrill\Documents\S6\BA-GULFstream\shiftRegSynch_v2\sim_files\runTot_fix.dat"; --sim_files\
         variable ln_r     : line;
         variable x : std_logic;
         
@@ -248,9 +252,16 @@ word_pack: process(clk_i, clk_div)
                  if rising_edge(clk_div) then 
                     if (comma_s = '0') and (synched_s = '1') then                   
                         case word_cnt_v is
-                            when "00" =>
-                                word_pack_s(31 downto 24) <= data8b_s;
-                                word_cnt_v := word_cnt_v +1;
+                            when "00" =>  
+                                                                                                             --<-- new 21.07.22
+                                if data8b_s(7) = '1' then  
+                                    hdr_bit_s <= '1';                            
+                                    word_pack_s(31 downto 24) <= data8b_s;
+                                    word_cnt_v := word_cnt_v +1;
+                                else
+                                    hdr_bit_s <= '0';
+                                end if;
+                                
                                 word_output_s <= '0';
                             when "01" =>
                                 word_pack_s(23 downto 16) <= data8b_s; 
@@ -274,6 +285,10 @@ word_pack: process(clk_i, clk_div)
                 end if;
             
     end process;
+    
+    --Error detecting
+    glb_error_s <= '1' when (hdr_bit_s = '0') or (rxCodeErr = '1') else '0';
+        
     
     ---- Write to Memory FSM ----
     valid_s <= word_output_s and (not rxCodeErr);        
