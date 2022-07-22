@@ -62,7 +62,7 @@ architecture Behavioral of shiftregsynch_top is
     signal bit_in_s : std_logic := '0';
     signal shiftreg_s: std_logic_vector(9 downto 0);
     signal locked_sig_o : std_logic_vector(9 downto 0);
-    signal synched_s, comma_s    : std_logic;
+    signal synched_s, comma_s, rst_o_s    : std_logic;
     
     -- Decoder
     signal data8b_s     : std_logic_vector(7 downto 0);
@@ -71,10 +71,12 @@ architecture Behavioral of shiftregsynch_top is
     -- Data Extraction
     signal word_pack_s  : std_logic_vector(31 downto 0);
     signal word_output_s : std_logic;
+    signal word_cnt_s   : std_logic_vector(1 downto 0);
     signal valid_s      : std_logic;                                                                        
     signal wr_en_s      : std_logic;     
     signal rst_fsm_s    : std_logic;   
     signal hdr_bit_s : std_logic; --for header check, error if 0 in first byte    
+    signal hdr_bit_err : std_logic;
     
     -- global signals
     signal glb_error_s  : std_logic;                                                           
@@ -106,6 +108,7 @@ architecture Behavioral of shiftregsynch_top is
             err_i : in std_logic;        
             reg_o : out std_logic_vector(9 downto 0);
             aligned_o : out std_logic;
+            rst_o   : out std_logic;
             comma_o : out std_logic
             );
        end component;
@@ -193,6 +196,7 @@ begin
             err_i => glb_error_s,
             reg_o => locked_sig_o,
             aligned_o => synched_s,
+            rst_o   => rst_o_s,
             comma_o => comma_s
         );
 
@@ -216,7 +220,7 @@ begin
     ---- Bit read in process ----
     rd_values: process(clk_i)
         
-        file fp_output : text is in "C:\Users\Cyrill\Documents\S6\BA-GULFstream\shiftRegSynch_v2\sim_files\runTot_fix.dat"; --sim_files\
+        file fp_output : text is in "C:\Users\Cyrill\Documents\S6\BA-GULFstream\shiftRegSynch_v2\sim_files\runTot_add5.dat"; --sim_files\
         variable ln_r     : line;
         variable x : std_logic;
         
@@ -261,7 +265,6 @@ word_pack: process(clk_i, clk_div)
                                 else
                                     hdr_bit_s <= '0';
                                 end if;
-                                
                                 word_output_s <= '0';
                             when "01" =>
                                 word_pack_s(23 downto 16) <= data8b_s; 
@@ -276,19 +279,21 @@ word_pack: process(clk_i, clk_div)
                             when others =>
                                 --word_output_s <= '0';
                             
-                        end case;
+                        end case; 
                     else
-                        word_cnt_v := "00";                                     --<-
+                        word_cnt_v := "00";                                   
                         word_output_s <= '0';
                         word_pack_s <= (others => '0');
+                        hdr_bit_s <= '1';
                     end if;
                 end if;
-            
+            word_cnt_s <= std_logic_vector(word_cnt_v);
     end process;
     
     --Error detecting
-    glb_error_s <= '1' when (hdr_bit_s = '0') or (rxCodeErr = '1') else '0';
-        
+    hdr_bit_err <= '1' when (word_cnt_s = "00" and hdr_bit_s = '0' and synched_s = '1') else '0';
+    glb_error_s <= '1' when (hdr_bit_err = '1') or (rxCodeErr = '1') else '0'; --and (comma_s = '0')
+
     
     ---- Write to Memory FSM ----
     valid_s <= word_output_s and (not rxCodeErr);        

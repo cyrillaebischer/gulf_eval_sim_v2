@@ -40,6 +40,7 @@ entity sync_statemachine is
         
         reg_o : out std_logic_vector(9 downto 0);
         aligned_o : out std_logic;
+        rst_o   : out std_logic;
         comma_o : out std_logic
     );
 end sync_statemachine;
@@ -93,9 +94,11 @@ begin
                             aligned_o <= '0';
                             reg_intl_s <= (others => '0');
                             reg_o <= (others => '0');
+                            rst_o <= '1';
                             state_s <= SCAN;
                             
                         when SCAN =>
+                            rst_o <= '0';
                             rst_cnt_s <= '1';
                             if reg_i = k28p0 then
                                 reg_intl_s <= reg_i;
