@@ -30,5 +30,6 @@ Compiling architecture behavioral of entity xil_defaultlib.sync_statemachine [sy
 Compiling architecture rtl of entity xil_defaultlib.Decode8b10b [decode8b10b_default]
 Compiling architecture behavioral of entity xil_defaultlib.data_wr_fsm [data_wr_fsm_default]
 Compiling architecture bhv of entity xil_defaultlib.Clock_Divider [clock_divider_default]
+Compiling architecture behavioral of entity xil_defaultlib.rollover_counter [rollover_counter_default]
 Compiling architecture behavioral of entity xil_defaultlib.shiftregsynch_top
 Built simulation snapshot shiftregsynch_top_behav

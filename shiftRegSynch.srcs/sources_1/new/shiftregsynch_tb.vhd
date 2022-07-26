@@ -56,6 +56,11 @@ architecture Behavioral of shiftregsynch_top is
     signal bert_err_cnt_s : std_logic_vector(15 downto 0);
     signal bert_bit_cnt_s : std_logic_vector(15 downto 0);
     
+    -- Coarse Time Roll Over
+    signal ro_counter_s : std_logic_vector(29 downto 0);
+    signal ro_cnt_rst, ro_cnt_en : std_logic;
+    signal CT_counter_s : std_logic_vector(15 downto 0);
+    
     signal rst_clkdiv : std_logic;
     
     -- Deserializer and Locking
@@ -91,6 +96,15 @@ architecture Behavioral of shiftregsynch_top is
             clock_out: out std_logic);
     end component;
     
+    component rollover_counter is
+        Port (
+            en_i    : in std_logic;
+            rst_i   : in std_logic;
+            clk_i   : in std_logic;
+            cnt_o   : out std_logic_vector(29 downto 0)
+             );
+    end component;
+        
     component sipo is
         port(
             clk_i :in std_logic;
@@ -141,41 +155,42 @@ begin
         addra => addr_bert_s,
         douta => data_bert_s
         );
-    
-    start_bert: process(clk_i)
-        begin
-        if rising_edge(clk_i) then
-            if rst_i = '1' then
-                en_bert_s <= '0';
-            else 
-                if d_in_mem /= bit_in_s then
-                    en_bert_s <= '1';
-                end if;
-            end if;
-        end if;
-        end process;
-        
+            
+    count_bert: process(clk_i)
+          variable bert_err_cnt :unsigned(15 downto 0) := (others => '0');
+          begin
+              if falling_edge(clk_i) then
+                  if rst_i = '1' then
+                      bert_err_cnt := (others => '0');
+                  elsif en_bert_s = '1' then
+                      if data_bert_s(0) /=  d_in_mem then   
+                         bert_err_cnt := bert_err_cnt + 1;
+                      end if; 
+                  end if;
+              end if;
+              bert_err_cnt_s <= std_logic_vector(bert_err_cnt);
+          end process;
+          
     BERT: process(clk_i, rst_i)
-        variable bert_err_cnt :unsigned(15 downto 0) := (others => '0');
-        variable bert_bit_cnt : unsigned(15 downto 0) := (others => '0');
-        begin
-            if rising_edge(clk_i) then
-                d_in_mem <= bit_in_s;
-                if rst_i = '1' then 
-                    bert_err_cnt := (others => '0');
-                else
-                    if en_bert_s = '1' then 
-                        bert_bit_cnt := bert_bit_cnt + 1; 
-                        if data_bert_s(0) /=  d_in_mem then   
-                            bert_err_cnt := bert_err_cnt + 1;
-                        end if;
-                    end if;
-                end if;
-            end if;
-            bert_err_cnt_s <= std_logic_vector(bert_err_cnt);
-            bert_bit_cnt_s <= std_logic_vector(bert_bit_cnt);
-        end process;
-    addr_bert_s    <= bert_bit_cnt_s;
+                      variable bert_bit_cnt : unsigned(15 downto 0) := (others => '0');
+                      begin
+                          if rising_edge(clk_i) then
+                              d_in_mem <= bit_in_s;
+                              if rst_i = '1' then 
+                                  en_bert_s <= '0';
+                                  bert_bit_cnt := (others => '0');
+                              else
+                                  if d_in_mem /= bit_in_s then
+                                      en_bert_s <= '1';
+                                  end if;
+                                  if en_bert_s = '1' then 
+                                      bert_bit_cnt := bert_bit_cnt + 1;   
+                                  end if;
+                              end if;
+                          end if;
+                          bert_bit_cnt_s <= std_logic_vector(bert_bit_cnt);
+                      end process;
+                  addr_bert_s    <= bert_bit_cnt_s;
     
     ---- shiftregister ----
     shift_reg: sipo
@@ -220,7 +235,7 @@ begin
     ---- Bit read in process ----
     rd_values: process(clk_i)
         
-        file fp_output : text is in "C:\Users\Cyrill\Documents\S6\BA-GULFstream\shiftRegSynch_v2\sim_files\runTot_add5.dat"; --sim_files\
+        file fp_output : text is in "C:\Users\Cyrill\Documents\S6\BA-GULFstream\shiftRegSynch_v2\sim_files\runTot.dat"; --sim_files\
         variable ln_r     : line;
         variable x : std_logic;
         
@@ -318,7 +333,39 @@ word_pack: process(clk_i, clk_div)
             reset=> rst_clkdiv,
             clock_out => clk_div
             );
+    
+    ---- Coarse Time counter Roll Over Couner ----
+    ro_cnt_rst <= not(synched_s);
+    
+    ro_counter: rollover_counter 
+        port map(
+            en_i    => ro_cnt_en,
+            rst_i   => ro_cnt_rst,
+            clk_i   => clk_div,
+            cnt_o   => ro_counter_s
+            );
             
+    rollover: process(clk_div)
+        variable CT_counter : unsigned(15 downto 0) := x"0000";
+        begin
+            if rising_edge(clk_div) then
+                if start_test = '1' then
+                    CT_counter := CT_counter + 1;
+                    if CT_counter = x"FFFF" then
+                        ro_cnt_en <= '1';
+                        CT_counter := (others => '0');
+                    else
+                        ro_cnt_en <= '0';
+                    end if;
+                else
+                    CT_counter := (others => '0');
+                    ro_cnt_en <= '0';
+                end if;
+            end if;
+        CT_counter_s <= std_logic_vector(CT_counter);
+        end process;
+            
+                
     ---- clock process ----   
 clkX1: process
     begin 

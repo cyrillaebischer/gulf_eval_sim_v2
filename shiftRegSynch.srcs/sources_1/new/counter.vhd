@@ -39,7 +39,7 @@ entity counter is
         
         cnt_o   : out std_logic_vector(3 downto 0)
          );
-end counter;
+end entity;
 
 architecture Behavioral of counter is
 
