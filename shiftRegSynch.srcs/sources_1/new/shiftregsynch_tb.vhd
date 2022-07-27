@@ -37,7 +37,9 @@ entity shiftregsynch_top is
     port(
         data_wr_out : out std_logic_vector(31 downto 0);
         addr_wr_out : out std_logic_vector(5 downto 0);
-        wr_en_out   : out std_logic
+        wr_en_out   : out std_logic;
+        wr_ro_out : out std_logic_vector(31 downto 0);
+        err_code_out : out std_logic_vector(1 downto 0)
     );   
 end shiftregsynch_top;
 
@@ -47,6 +49,7 @@ architecture Behavioral of shiftregsynch_top is
     constant clk_i_period : time := 0.78 ns;  -- 1/127 = 7.8740157
     signal clk_i, rst_i, clk_div: std_logic;
     signal start_test   : std_logic := '0';
+    signal clk_127MHz   : std_logic;
     
     -- BERT
     signal en_bert_s   : std_logic;
@@ -57,7 +60,7 @@ architecture Behavioral of shiftregsynch_top is
     signal bert_bit_cnt_s : std_logic_vector(15 downto 0);
     
     -- Coarse Time Roll Over
-    signal ro_counter_s : std_logic_vector(29 downto 0);
+    signal ro_counter_s : std_logic_vector(31 downto 0);
     signal ro_cnt_rst, ro_cnt_en : std_logic;
     signal CT_counter_s : std_logic_vector(15 downto 0);
     
@@ -84,8 +87,10 @@ architecture Behavioral of shiftregsynch_top is
     signal hdr_bit_err : std_logic;
     
     -- global signals
-    signal glb_error_s  : std_logic;                                                           
-    
+    signal glb_error_s  : std_logic;      
+                                                         
+    -- err_code_out(0) : Header Bit Error
+    -- err_code_out(1) : Decoder Code Error
     
     ---------------------------------------------------------------------------------
     -- BEGIN COMPONENT DECLARATIONS --
@@ -101,7 +106,7 @@ architecture Behavioral of shiftregsynch_top is
             en_i    : in std_logic;
             rst_i   : in std_logic;
             clk_i   : in std_logic;
-            cnt_o   : out std_logic_vector(29 downto 0)
+            cnt_o   : out std_logic_vector(31 downto 0)
              );
     end component;
         
@@ -133,9 +138,11 @@ architecture Behavioral of shiftregsynch_top is
                 clk_i : in std_logic;
                 valid_i : in std_logic;
                 wr_data_in : in std_logic_vector(31 downto 0);
+                ro_cnt_in : in std_logic_vector(31 downto 0);
                 wr_data_out : out std_logic_vector(31 downto 0);
                 wr_en_o: out std_logic;
-                wr_adr_o : out std_logic_vector(5 downto 0));
+                wr_adr_o : out std_logic_vector(5 downto 0);
+                ro_cnt_out : out std_logic_vector(31 downto 0));
        end component;
        
        COMPONENT blk_mem_gen_0
@@ -305,10 +312,12 @@ word_pack: process(clk_i, clk_div)
             word_cnt_s <= std_logic_vector(word_cnt_v);
     end process;
     
-    --Error detecting
+    ---- Error detecting ----
     hdr_bit_err <= '1' when (word_cnt_s = "00" and hdr_bit_s = '0' and synched_s = '1') else '0';
     glb_error_s <= '1' when (hdr_bit_err = '1') or (rxCodeErr = '1') else '0'; --and (comma_s = '0')
-
+    err_code_out(0) <= '1' when hdr_bit_err = '1' else '0';
+    err_code_out(1) <= '1' when rxCodeErr = '1' else '0';
+    -- write error code on output
     
     ---- Write to Memory FSM ----
     valid_s <= word_output_s and (not rxCodeErr);        
@@ -321,9 +330,11 @@ word_pack: process(clk_i, clk_div)
                    clk_i    => clk_div,
                    valid_i  => word_output_s,
                    wr_data_in => word_pack_s,
+                   ro_cnt_in => ro_counter_s,
                    wr_data_out => data_wr_out,
                    wr_en_o  => wr_en_s,
-                   wr_adr_o => addr_wr_out
+                   wr_adr_o => addr_wr_out,
+                   ro_cnt_out => wr_ro_out
                    );                   
         
     rst_clkdiv <= not(synched_s);
@@ -333,22 +344,30 @@ word_pack: process(clk_i, clk_div)
             reset=> rst_clkdiv,
             clock_out => clk_div
             );
+            
+    slow_clk: Clock_Divider
+        port map(
+            clk => clk_i,
+            reset => rst_i,
+            clock_out => clk_127MHz
+            );
+            
     
-    ---- Coarse Time counter Roll Over Couner ----
-    ro_cnt_rst <= not(synched_s);
+    ---- Coarse Time counter Roll Over Counter ----
+    -- ro_cnt_rst <= not(synched_s);
     
     ro_counter: rollover_counter 
         port map(
             en_i    => ro_cnt_en,
-            rst_i   => ro_cnt_rst,
-            clk_i   => clk_div,
+            rst_i   => rst_i,
+            clk_i   => clk_127MHz,
             cnt_o   => ro_counter_s
             );
             
-    rollover: process(clk_div)
-        variable CT_counter : unsigned(15 downto 0) := x"0000";
-        begin
-            if rising_edge(clk_div) then
+    rollover: process(clk_127MHz)
+        variable CT_counter : unsigned(15 downto 0) := x"FF00";          -- x"FF00" initialization only for Test purposes,
+        begin                                                            -- real initialization: x"0000"
+            if rising_edge(clk_127MHz) then
                 if start_test = '1' then
                     CT_counter := CT_counter + 1;
                     if CT_counter = x"FFFF" then
@@ -358,7 +377,7 @@ word_pack: process(clk_i, clk_div)
                         ro_cnt_en <= '0';
                     end if;
                 else
-                    CT_counter := (others => '0');
+                    -- CT_counter := (others => '0');   --comment for test purposes
                     ro_cnt_en <= '0';
                 end if;
             end if;
