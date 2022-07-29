@@ -49,7 +49,7 @@ architecture Behavioral of shiftregsynch_top is
     constant clk_i_period : time := 0.78 ns;  -- 1/127 = 7.8740157
     signal clk_i, rst_i, clk_div: std_logic;
     signal start_test   : std_logic := '0';
-    signal clk_127MHz   : std_logic;
+    --signal clk_127MHz   : std_logic;
     
     -- BERT
     signal en_bert_s   : std_logic;
@@ -61,7 +61,6 @@ architecture Behavioral of shiftregsynch_top is
     
     -- Coarse Time Roll Over
     signal ro_counter_s : std_logic_vector(31 downto 0);
-    signal ro_cnt_rst, ro_cnt_en : std_logic;
     signal CT_counter_s : std_logic_vector(15 downto 0);
     
     signal rst_clkdiv : std_logic;
@@ -101,14 +100,14 @@ architecture Behavioral of shiftregsynch_top is
             clock_out: out std_logic);
     end component;
     
-    component rollover_counter is
-        Port (
-            en_i    : in std_logic;
-            rst_i   : in std_logic;
-            clk_i   : in std_logic;
-            cnt_o   : out std_logic_vector(31 downto 0)
-             );
-    end component;
+--    component rollover_counter is
+--        Port (
+--            en_i    : in std_logic;
+--            rst_i   : in std_logic;
+--            clk_i   : in std_logic;
+--            cnt_o   : out std_logic_vector(31 downto 0)
+--             );
+--    end component;
         
     component sipo is
         port(
@@ -315,9 +314,11 @@ word_pack: process(clk_i, clk_div)
     ---- Error detecting ----
     hdr_bit_err <= '1' when (word_cnt_s = "00" and hdr_bit_s = '0' and synched_s = '1') else '0';
     glb_error_s <= '1' when (hdr_bit_err = '1') or (rxCodeErr = '1') else '0'; --and (comma_s = '0')
+    
+    -- write error code on output
     err_code_out(0) <= '1' when hdr_bit_err = '1' else '0';
     err_code_out(1) <= '1' when rxCodeErr = '1' else '0';
-    -- write error code on output
+    
     
     ---- Write to Memory FSM ----
     valid_s <= word_output_s and (not rxCodeErr);        
@@ -345,43 +346,47 @@ word_pack: process(clk_i, clk_div)
             clock_out => clk_div
             );
             
-    slow_clk: Clock_Divider
-        port map(
-            clk => clk_i,
-            reset => rst_i,
-            clock_out => clk_127MHz
-            );
+--    slow_clk: Clock_Divider
+--        port map(
+--            clk => clk_i,
+--            reset => rst_i,
+--            clock_out => clk_127MHz
+--            );
             
     
     ---- Coarse Time counter Roll Over Counter ----
     -- ro_cnt_rst <= not(synched_s);
     
-    ro_counter: rollover_counter 
-        port map(
-            en_i    => ro_cnt_en,
-            rst_i   => rst_i,
-            clk_i   => clk_127MHz,
-            cnt_o   => ro_counter_s
-            );
+--    ro_counter: rollover_counter 
+--        port map(
+--            en_i    => ro_cnt_en,
+--            rst_i   => rst_i,
+--            clk_i   => clk_127MHz,
+--            cnt_o   => ro_counter_s
+--            );
             
-    rollover: process(clk_127MHz)
+    rollover: process(clk_div, rst_clkdiv)
         variable CT_counter : unsigned(15 downto 0) := x"FF00";          -- x"FF00" initialization only for Test purposes,
-        begin                                                            -- real initialization: x"0000"
-            if rising_edge(clk_127MHz) then
+                                                                         -- real initialization: x"0000"
+        variable RO_counter : unsigned(31 downto 0) := (others => '0');
+        begin 
+            if rst_clkdiv = '1' then
+                --CT_counter := (others => '0');
+                RO_counter := (others => '0');                                                       
+            elsif rising_edge(clk_div) then
                 if start_test = '1' then
                     CT_counter := CT_counter + 1;
                     if CT_counter = x"FFFF" then
-                        ro_cnt_en <= '1';
+                        --ro_cnt_en <= '1';
+                        RO_counter := RO_counter + 1;
                         CT_counter := (others => '0');
-                    else
-                        ro_cnt_en <= '0';
                     end if;
                 else
                     -- CT_counter := (others => '0');   --comment for test purposes
-                    ro_cnt_en <= '0';
                 end if;
             end if;
         CT_counter_s <= std_logic_vector(CT_counter);
+        ro_counter_s <= std_logic_vector(RO_counter);
         end process;
             
                 

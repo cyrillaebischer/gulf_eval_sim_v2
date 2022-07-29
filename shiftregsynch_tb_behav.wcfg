@@ -12,15 +12,18 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="99868333333fs"></ZoomStartTime>
-      <ZoomEndTime time="101226333334fs"></ZoomEndTime>
-      <Cursor1Time time="101000000000fs"></Cursor1Time>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="39300000001fs"></ZoomEndTime>
+      <Cursor1Time time="1828350000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="204"></NameColumnWidth>
-      <ValueColumnWidth column_width="75"></ValueColumnWidth>
+      <NameColumnWidth column_width="181"></NameColumnWidth>
+      <ValueColumnWidth column_width="67"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="30" />
+   <WVObjectSize size="29" />
+   <wave_markers>
+      <marker time="183690000" label="" />
+   </wave_markers>
    <wvobject fp_name="/shiftregsynch_top/clk_i" type="logic">
       <obj_property name="ElementShortName">clk_i</obj_property>
       <obj_property name="ObjectShortName">clk_i</obj_property>
@@ -44,6 +47,18 @@
    <wvobject fp_name="/shiftregsynch_top/clk_divider/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider39">
+      <obj_property name="label">Synchronization</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/commalink/state_s" type="other">
+      <obj_property name="ElementShortName">state_s</obj_property>
+      <obj_property name="ObjectShortName">state_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/shiftregsynch_top/commalink/err_i" type="logic">
+      <obj_property name="ElementShortName">err_i</obj_property>
+      <obj_property name="ObjectShortName">err_i</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider25">
       <obj_property name="label">Decoder</obj_property>
@@ -96,18 +111,6 @@
       <obj_property name="ElementShortName">hdr_bit_s</obj_property>
       <obj_property name="ObjectShortName">hdr_bit_s</obj_property>
    </wvobject>
-   <wvobject type="divider" fp_name="divider39">
-      <obj_property name="label">Synchronization</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_top/commalink/state_s" type="other">
-      <obj_property name="ElementShortName">state_s</obj_property>
-      <obj_property name="ObjectShortName">state_s</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_top/commalink/err_i" type="logic">
-      <obj_property name="ElementShortName">err_i</obj_property>
-      <obj_property name="ObjectShortName">err_i</obj_property>
-   </wvobject>
    <wvobject type="divider" fp_name="divider32">
       <obj_property name="label">RAM / Output</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -153,6 +156,7 @@
    <wvobject fp_name="group34" type="group">
       <obj_property name="label">bert</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/shiftregsynch_top/en_bert_s" type="logic">
          <obj_property name="ElementShortName">en_bert_s</obj_property>
          <obj_property name="ObjectShortName">en_bert_s</obj_property>
@@ -198,9 +202,5 @@
    <wvobject fp_name="/shiftregsynch_top/ro_counter_s" type="array">
       <obj_property name="ElementShortName">ro_counter_s[31:0]</obj_property>
       <obj_property name="ObjectShortName">ro_counter_s[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/shiftregsynch_top/ro_cnt_en" type="logic">
-      <obj_property name="ElementShortName">ro_cnt_en</obj_property>
-      <obj_property name="ObjectShortName">ro_cnt_en</obj_property>
    </wvobject>
 </wave_config>
